@@ -18,4 +18,14 @@ func Test1(t *testing.T) {
 	if x != 3 || y != 4 || n != 30 {
 		t.Fatal("not 3,4:", x, y, v, n)
 	}
+
+	x, y, v, n = FindMinTri(1, 0, 0, 2, 2, f1, nil)
+	if x != 4 || y != 4 || n != 16 {
+		t.Fatal("tri not 4,4:", x, y, v, n)
+	}
+
+	x, y, v, n = FindMinTri(2, 0, 0, 2, 2, f1, nil)
+	if x != 3 || y != 4 || n != 23 {
+		t.Fatal("tri not 3,4:", x, y, v, n)
+	}
 }
