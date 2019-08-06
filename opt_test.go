@@ -8,24 +8,27 @@ func f1(x, y int) float64 {
 	return a*a + b*b
 }
 
+type res struct {
+	f func(r, x0, y0, dx, dy int, fn func(x, y int) float64,
+		pr func(int, int, float64)) (int, int, float64, uint)
+	r, x, y int
+	n       uint
+}
+
+var rs = [...]res{
+	{FindMin, 1, 4, 4, 14},
+	{FindMin, -1, 4, 4, 19},
+	{FindMin, 2, 3, 4, 21},
+	{FindMin, -2, 3, 4, 30},
+	{FindMinTri, 1, 4, 4, 16},
+	{FindMinTri, 2, 3, 4, 23},
+}
+
 func Test1(t *testing.T) {
-	x, y, v, n := FindMin(1, 0, 0, 2, 2, f1, nil)
-	if x != 4 || y != 4 || n != 19 {
-		t.Fatal("not 4,4:", x, y, v, n)
-	}
-
-	x, y, v, n = FindMin(2, 0, 0, 2, 2, f1, nil)
-	if x != 3 || y != 4 || n != 30 {
-		t.Fatal("not 3,4:", x, y, v, n)
-	}
-
-	x, y, v, n = FindMinTri(1, 0, 0, 2, 2, f1, nil)
-	if x != 4 || y != 4 || n != 16 {
-		t.Fatal("tri not 4,4:", x, y, v, n)
-	}
-
-	x, y, v, n = FindMinTri(2, 0, 0, 2, 2, f1, nil)
-	if x != 3 || y != 4 || n != 23 {
-		t.Fatal("tri not 3,4:", x, y, v, n)
+	for i, v := range rs {
+		x, y, _, n := v.f(v.r, 0, 0, 2, 2, f1, nil)
+		if x != v.x || y != v.y || n != v.n {
+			t.Fatal(i, "gave:", x, y, n, "expected:", v.x, v.y, v.n)
+		}
 	}
 }

@@ -41,8 +41,9 @@ func shiftRectGrid(k int, fv *[9]float64) {
 }
 
 // FindMin minimizes positive fn() over (x,y) rectangular grid starting at (x0,y0) with
-// (±dx,±dy) steps for up to r runs, halving step sizes between runs. If given pr(), calls it
+// (±dx,±dy) steps for up to |r| runs, halving step sizes between runs. If given pr(), calls it
 // at every new optimal value (could be used for printing progress). Calls fn() at least once.
+// If r<0, diagonal steps are also allowed.
 // Returns optimal point & fn() value, and number of calls to fn().
 func FindMin(r, x0, y0, dx, dy int, fn func(x, y int) float64,
 	pr func(int, int, float64)) (int, int, float64, uint) {
@@ -55,7 +56,11 @@ func FindMin(r, x0, y0, dx, dy int, fn func(x, y int) float64,
 	}
 
 	var Ix, Iy [9]int          // increment arrays
-	start, end, inc := 0, 8, 1 // loop vars
+	start, end, inc := 1, 7, 2 // loop vars
+	if r < 0 {
+		start, end, inc = 0, 8, 1 // allow diagonal steps
+		r = -r
+	}
 
 	for ; r > 0; r-- {
 
