@@ -41,19 +41,25 @@ func shiftRectGrid(k int, fv *[9]float64) {
 }
 
 // FindMin minimizes positive fn() over (x,y) rectangular grid starting at (x0,y0) with
-// (±dx,±dy) steps for up to |r| runs, halving step sizes between runs. If given pr(), calls it
-// at every new optimal value (could be used for printing progress). Calls fn() at least once.
-// If r<0, diagonal steps are also allowed.
+// (±dx,±dy) steps for up to |r| runs, halving step sizes between runs. If given pr(),
+// calls it at every new optimal value (could be used for printing progress). Calls fn()
+// at least once. If r<0, diagonal steps are also allowed.
 // Returns optimal point & fn() value, and number of calls to fn().
 func FindMin(r, x0, y0, dx, dy int, fn func(x, y int) float64,
 	pr func(int, int, float64)) (int, int, float64, uint) {
 
 	var fv [9]float64  // fn() values
 	fv[4] = fn(x0, y0) // center
-	nc := uint(1)      // number of calls to fn()
 	if pr != nil {
 		pr(x0, y0, fv[4])
 	}
+
+	return findMin(&fv, 1, r, x0, y0, dx, dy, fn, pr)
+}
+
+// fv and number of calls to fn() are given by caller
+func findMin(fv *[9]float64, nc uint, r, x0, y0, dx, dy int, fn func(x, y int) float64,
+	pr func(int, int, float64)) (int, int, float64, uint) {
 
 	var Ix, Iy [9]int          // increment arrays
 	start, end, inc := 1, 7, 2 // loop vars
@@ -110,7 +116,7 @@ func FindMin(r, x0, y0, dx, dy int, fn func(x, y int) float64,
 				pr(x0, y0, fv[k])
 			}
 
-			shiftRectGrid(k, &fv)
+			shiftRectGrid(k, fv)
 		}
 
 		dx /= 2 // halve steps
@@ -149,9 +155,10 @@ func shiftTriGrid(k int, fv *[7]float64) {
 }
 
 // FindMinTri minimizes positive fn() over (x,y) triangular grid starting at (x0,y0) with
-// (±dx,±dy) steps for up to r runs, halving step sizes between runs. If given pr(), calls it
-// at every new optimal value (could be used for printing progress). Calls fn() at least once.
-// Choose dy ~ 0.866*dx for equilateral grid. Faster than FindMin() via lesser calls to fn().
+// (±dx,±dy) steps for up to r runs, halving step sizes between runs. If given pr(),
+// calls it at every new optimal value (could be used for printing progress). Calls fn()
+// at least once. Choose dy ~ 0.866*dx for equilateral grid. Faster than FindMin() via
+// fewer calls to fn().
 // Returns optimal point & fn() value, and number of calls to fn().
 func FindMinTri(r, x0, y0, dx, dy int, fn func(x, y int) float64,
 	pr func(int, int, float64)) (int, int, float64, uint) {
@@ -179,7 +186,10 @@ func FindMinTri(r, x0, y0, dx, dy int, fn func(x, y int) float64,
 		} else if dx == -dx {
 			start, end, inc, dx, hx = 1, 5, 2, 0, 0 // y only
 		} else if hx == 0 {
-			start, end, inc = 1, 5, 1 // cross
+			// a cross-shaped grid handed over to findMin()
+			var nfv [9]float64
+			nfv[4] = fv[3]
+			return findMin(&nfv, nc, r, x0, y0, dx, dy, fn, pr)
 		}
 
 		// set increments
