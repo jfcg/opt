@@ -2,10 +2,23 @@ package opt
 
 import "testing"
 
+// to be minimized
 func f1(x, y int) float64 {
 	a := float64(x) - 3.3
 	b := float64(y) - 4.4
 	return a*a + b*b
+}
+
+var (
+	px, py int
+	po     float64
+	pn     uint
+)
+
+// called at every new optima
+func pro(x, y int, o float64) {
+	px, py, po = x, y, o
+	pn++
 }
 
 type res struct {
@@ -26,8 +39,11 @@ var rs = [...]res{
 
 func Test1(t *testing.T) {
 	for i, v := range rs {
-		x, y, _, n := v.f(v.r, 0, 0, 2, 2, f1, nil)
-		if x != v.x || y != v.y || n != v.n {
+		pn = 0
+		x, y, o, n := v.f(v.r, 0, 0, 2, 2, f1, pro)
+		if x != v.x || y != v.y || n != v.n || // expected result
+			x != px || y != py || o != po || // last pro() call records result
+			pn == 0 || n < pn { // f1() calls >= pro() calls > 0
 			t.Fatal(i, "gave:", x, y, n, "expected:", v.x, v.y, v.n)
 		}
 	}
