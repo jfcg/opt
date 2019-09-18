@@ -81,10 +81,10 @@ func findMin(fv *[9]float64, nc uint, r, x0, y0, dx, dy int, fn func(x, y int) f
 			if dx == -dx { // halt if both are 0/minInt
 				return x0, y0, fv[4], nc
 			}
-			start, end, inc, dy = 3, 5, 1, 0 // x only
+			start, end, inc, dy = 3, 5, 2, 0 // x only
 
 		} else if dx == -dx {
-			start, end, inc, dx = 1, 7, 3, 0 // y only
+			start, end, inc, dx = 1, 7, 6, 0 // y only
 		}
 
 		// set increments
@@ -187,10 +187,10 @@ func FindMinTri(r, x0, y0, dx, dy int, fn func(x, y int) float64,
 			if dx == -dx { // halt if both are 0/minInt
 				return x0, y0, fv[3], nc
 			}
-			start, end, inc, dy = 2, 4, 1, 0 // x only
+			start, end, inc, dy = 2, 4, 2, 0 // x only
 
 		} else if dx == -dx {
-			start, end, inc, dx, hx = 1, 5, 2, 0, 0 // y only
+			start, end, inc, dx, hx = 1, 5, 4, 0, 0 // y only
 		} else if hx == 0 {
 			// a cross-shaped grid handed over to findMin()
 			var nfv [9]float64
