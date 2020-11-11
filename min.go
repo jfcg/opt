@@ -56,16 +56,10 @@ func FindMin(r, x0, y0, dx, dy int, fn func(x, y int) float64,
 
 	var fv [9]float64  // fn() values
 	fv[4] = fn(x0, y0) // center
+	nc := uint(1)      // number of calls to fn()
 	if pr != nil {
 		pr(x0, y0, fv[4])
 	}
-
-	return findMin(&fv, 1, r, x0, y0, dx, dy, fn, pr)
-}
-
-// fv and number of calls to fn() are given by caller
-func findMin(fv *[9]float64, nc uint, r, x0, y0, dx, dy int, fn func(x, y int) float64,
-	pr func(int, int, float64)) (int, int, float64, uint) {
 
 	var Ix, Iy [9]int          // increment arrays
 	start, end, inc := 1, 7, 2 // loop vars
@@ -122,7 +116,7 @@ func findMin(fv *[9]float64, nc uint, r, x0, y0, dx, dy int, fn func(x, y int) f
 				pr(x0, y0, fv[k])
 			}
 
-			shiftRectGrid(k, fv)
+			shiftRectGrid(k, &fv)
 		}
 
 		dx /= 2 // halve steps
@@ -180,8 +174,8 @@ func FindMinTri(r, x0, y0, dx, dy int, fn func(x, y int) float64,
 	start, end, inc := 0, 6, 1 // loop vars
 
 	for ; r > 0; r-- {
-
 		hx := dx / 2
+
 		// check dx/dy, fix loop vars
 		if dy == -dy {
 			if dx == -dx { // halt if both are 0/minInt
@@ -192,10 +186,7 @@ func FindMinTri(r, x0, y0, dx, dy int, fn func(x, y int) float64,
 		} else if dx == -dx {
 			start, end, inc, dx, hx = 1, 5, 4, 0, 0 // y only
 		} else if hx == 0 {
-			// a cross-shaped grid handed over to findMin()
-			var nfv [9]float64
-			nfv[4] = fv[3]
-			return findMin(&nfv, nc, r, x0, y0, dx, dy, fn, pr)
+			start, end, inc = 1, 5, 1 // cross
 		}
 
 		// set increments
@@ -235,7 +226,7 @@ func FindMinTri(r, x0, y0, dx, dy int, fn func(x, y int) float64,
 			shiftTriGrid(k, &fv)
 		}
 
-		dx = hx // halve steps
+		dx /= 2 // halve steps
 		dy /= 2
 	}
 	return x0, y0, fv[3], nc
