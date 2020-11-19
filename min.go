@@ -184,14 +184,14 @@ func FindMinTri(r, x0, y0, dx, dy int, fn func(x, y int) float64,
 			start, end, inc, dy = 2, 4, 2, 0 // x only
 
 		} else if dx == -dx {
-			start, end, inc, dx, hx = 1, 5, 4, 0, 0 // y only
+			start, end, inc, dx, hx = 0, 6, 6, 0, 0 // y only
 		} else if hx == 0 {
-			start, end, inc = 1, 5, 1 // cross
+			start, end, inc = 0, 6, 2 // cross
 		}
 
 		// set increments
-		Ix[4], Ix[5], Ix[6] = dx, -hx, dx-hx
-		Ix[2], Ix[1], Ix[0] = -dx, hx, hx-dx
+		Ix[4], Ix[5], Ix[6] = dx, hx-dx, hx
+		Ix[2], Ix[1], Ix[0] = -dx, dx-hx, -hx
 
 		Iy[0], Iy[1], Iy[5], Iy[6] = -dy, -dy, dy, dy
 
